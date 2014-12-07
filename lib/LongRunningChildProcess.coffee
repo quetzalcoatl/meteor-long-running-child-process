@@ -1,7 +1,7 @@
 fs = Npm.require 'fs-extra'
 path = Npm.require 'path'
 assert = Npm.require 'assert'
-spawn = Npm.require('child_process').spawn
+child_process = Npm.require 'child_process'
 
 @sanjo ?= {}
 
@@ -112,8 +112,6 @@ class sanjo.LongRunningChildProcess
   spawn: (options) ->
     log.debug "LongRunningChildProcess.spawn()", options
     check options, Match.ObjectIncluding({
-        killSignals: Match.Optional([String])
-        logToConsole: Match.Optional(Boolean)
         command: String
         args: [String]
         options: Match.Optional(Match.ObjectIncluding({
@@ -129,7 +127,6 @@ class sanjo.LongRunningChildProcess
     logFile = @_getLogFilePath()
     fs.ensureDirSync(path.dirname(logFile))
     @fout = fs.openSync(logFile, 'w')
-    #@ferr = fs.openSync(logFile, 'w')
 
     spawnOptions = {
       cwd: @_getMeteorAppPath(),
@@ -144,13 +141,12 @@ class sanjo.LongRunningChildProcess
 
     log.debug("LongRunningChildProcess.spawn is spawning '#{command}'")
 
-    @child = spawn('node', commandArgs, spawnOptions)
+    @child = child_process.spawn('node', commandArgs, spawnOptions)
     @dead = false
     @_setPid(@child.pid)
 
     @child.on "exit", (code) =>
       log.debug "LongRunningChildProcess: child_process.on 'exit': command=#{command} code=#{code}"
-      fs.closeSync(@fout)
 
     return true
 
@@ -174,3 +170,12 @@ class sanjo.LongRunningChildProcess
         fs.removeSync(@_getPidFilePath())
       catch err
         log.warn "Error: While killing process:\n", err
+
+
+# Expose the imports in testing mode to make it possible to mock them
+if process.env.IS_MIRROR == 'true'
+  log.info 'Exposing imports for testing purposes'
+  sanjo.LongRunningChildProcess.fs = fs
+  sanjo.LongRunningChildProcess.path = path
+  sanjo.LongRunningChildProcess.assert = assert
+  sanjo.LongRunningChildProcess.child_process = child_process
