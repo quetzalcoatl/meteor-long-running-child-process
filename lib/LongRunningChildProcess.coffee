@@ -129,6 +129,8 @@ class sanjo.LongRunningChildProcess
       }
     )
 
+    options.options = {} unless options.options
+
     if @isRunning()
       return false
 
@@ -138,13 +140,11 @@ class sanjo.LongRunningChildProcess
 
     nodePath = process.execPath
     nodeDir = path.dirname(nodePath)
-    env = _.defaults({
+    env = _.clone(options.options.env or process.env)
     # Expose the Meteor node binary path for the script that is run
-      PATH: nodeDir + ':' + process.env.PATH
-    }, process.env)
-
+    env.PATH = nodeDir + ':' + (env.PATH or process.env.PATH)
     spawnOptions = {
-      cwd: @_getMeteorAppPath(),
+      cwd: options.options.cwd or @_getMeteorAppPath(),
       env: env,
       detached: true,
       stdio: ['ignore', @fout, @fout]
