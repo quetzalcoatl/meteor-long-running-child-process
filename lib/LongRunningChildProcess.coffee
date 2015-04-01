@@ -68,10 +68,18 @@ class sanjo.LongRunningChildProcess
   # Returns the pid of the main Meteor app process
   _getMeteorPid: ->
     parentPid = null
+    # For Meteor < 1.0.3
     parentPidIndex = _.indexOf(process.argv, '--parent-pid')
     if parentPidIndex != -1
       parentPid = process.argv[parentPidIndex + 1]
-    log.debug("The pid of the main Meteor app process is #{parentPid}")
+      log.debug("The pid of the main Meteor app process is #{parentPid}")
+    # For Meteor >= 1.0.3
+    else if process.env.METEOR_PARENT_PID
+      parentPid = process.env.METEOR_PARENT_PID
+      log.debug("The pid of the main Meteor app process is #{parentPid}")
+    else
+      log.error('Could not find the pid of the main Meteor app process')
+
     return parentPid
 
 
@@ -128,9 +136,16 @@ class sanjo.LongRunningChildProcess
     fs.ensureDirSync(path.dirname(logFile))
     @fout = fs.openSync(logFile, 'w')
 
+    nodePath = process.execPath
+    nodeDir = path.dirname(nodePath)
+    env = _.defaults({
+    # Expose the Meteor node binary path for the script that is run
+      PATH: nodeDir + ':' + process.env.PATH
+    }, process.env)
+
     spawnOptions = {
       cwd: @_getMeteorAppPath(),
-      env: process.env,
+      env: env,
       detached: true,
       stdio: ['ignore', @fout, @fout]
     }
@@ -141,12 +156,13 @@ class sanjo.LongRunningChildProcess
 
     log.debug("LongRunningChildProcess.spawn is spawning '#{command}'")
 
-    @child = child_process.spawn('node', commandArgs, spawnOptions)
+    @child = child_process.spawn(nodePath, commandArgs, spawnOptions)
     @dead = false
     @_setPid(@child.pid)
 
     @child.on "exit", (code) =>
       log.debug "LongRunningChildProcess: child_process.on 'exit': command=#{command} code=#{code}"
+      fs.closeSync(@fout)
 
     return true
 

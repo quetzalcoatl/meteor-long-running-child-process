@@ -137,12 +137,10 @@ Jasmine.onTest ->
         it 'passes the environment variables to the child process', ->
           @spawn()
 
-          expect(LongRunningChildProcess.child_process.spawn).toHaveBeenCalledWith(
-            jasmine.any(String),
-            jasmine.any(Array),
-            jasmine.objectContaining(
-              env: process.env
-            )
+          options = LongRunningChildProcess.child_process.spawn
+            .calls.mostRecent().args[2]
+          expect(options.env).toEqual(
+            jasmine.objectContaining(_.omit(process.env, 'PATH'))
           )
 
         it 'sets the cwd of the child process to the meteor app path', ->
@@ -172,7 +170,7 @@ Jasmine.onTest ->
           @spawn()
 
           expect(LongRunningChildProcess.child_process.spawn).toHaveBeenCalledWith(
-            'node',
+            process.execPath,
             [
               spawnScriptPath,
               meteorPid,
@@ -219,24 +217,24 @@ Jasmine.onTest ->
           @child.dead = false
 
         it 'kills the child process', ->
-          @kill()
+          @child.kill()
 
           expect(@child.child.kill).toHaveBeenCalledWith('SIGINT')
 
         it 'sets the child process to dead', ->
-          @kill()
+          @child.kill()
 
           expect(@child.isDead()).toBe(true)
 
         it 'sets the pid to null', ->
           @child.pid = 1234
 
-          @kill()
+          @child.kill()
 
           expect(@child.getPid()).toBe(null)
 
         it 'removes the pid file', ->
-          @kill()
+          @child.kill()
 
           expect(LongRunningChildProcess.fs.removeSync)
             .toHaveBeenCalledWith(@child._getPidFilePath())
@@ -246,7 +244,7 @@ Jasmine.onTest ->
           @child.dead = true
 
         it 'does not kill anything', ->
-          @kill()
+          @child.kill()
 
           expect(@child.child.kill).not.toHaveBeenCalled()
           expect(process.kill).not.toHaveBeenCalled()

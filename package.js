@@ -12,7 +12,7 @@ Npm.depends({
 Package.onUse(function(api) {
   api.export('LongRunningChildProcess', 'server')
 
-  api.versionsFrom('1.0');
+  api.versionsFrom('1.0.3.2');
   api.use('coffeescript', 'server')
   api.use('underscore', 'server')
   api.use('check', 'server')
