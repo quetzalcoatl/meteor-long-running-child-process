@@ -102,7 +102,8 @@ class sanjo.LongRunningChildProcess
 
   _getSpawnScriptPath: ->
     path.join(@_getMeteorLocalPath(),
-      'build/programs/server/assets/packages/sanjo_karma/lib/spawnScript.js'
+      'build/programs/server/assets/packages/' +
+      'sanjo_long-running-child-process/lib/spawnScript.js'
     )
 
 
@@ -121,9 +122,9 @@ class sanjo.LongRunningChildProcess
     log.debug "LongRunningChildProcess.spawn()", options
     check options, Match.ObjectIncluding({
         command: String
-        args: [String]
+        args: [Match.Any]
         options: Match.Optional(Match.ObjectIncluding({
-          cwd: Match.Optional(String)
+          cwd: Match.Optional(Match.OneOf(String, undefined))
           env: Match.Optional(Object)
         }))
       }

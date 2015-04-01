@@ -7,4 +7,4 @@ export LONG_RUNNING_CHILD_PROCESS_LOG_LEVEL=debug
 export VELOCITY_DEBUG=1
 export VELOCITY_DEBUG_MIRROR=1
 
-meteor
+meteor --test --port 4444
