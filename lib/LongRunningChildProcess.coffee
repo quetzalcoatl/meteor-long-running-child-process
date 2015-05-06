@@ -126,7 +126,7 @@ class sanjo.LongRunningChildProcess
         options: Match.Optional(Match.ObjectIncluding({
           cwd: Match.Optional(Match.OneOf(String, undefined))
           env: Match.Optional(Object)
-          stdio: Match.Optional(Match.OneOf(String, [String]))
+          stdio: Match.Optional(Match.OneOf(String, [Match.Any]))
         }))
       }
     )
