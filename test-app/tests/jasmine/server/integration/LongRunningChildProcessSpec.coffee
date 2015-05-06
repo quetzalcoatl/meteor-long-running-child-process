@@ -174,6 +174,7 @@ Jasmine.onTest ->
             [
               spawnScriptPath,
               meteorPid,
+              @taskName,
               @spawnOptions.command,
               'foo-arg'
             ],
