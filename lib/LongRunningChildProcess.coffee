@@ -126,6 +126,7 @@ class sanjo.LongRunningChildProcess
         options: Match.Optional(Match.ObjectIncluding({
           cwd: Match.Optional(Match.OneOf(String, undefined))
           env: Match.Optional(Object)
+          stdio: Match.Optional(Match.OneOf(String, [String]))
         }))
       }
     )
@@ -137,7 +138,12 @@ class sanjo.LongRunningChildProcess
 
     logFile = @_getLogFilePath()
     fs.ensureDirSync(path.dirname(logFile))
-    @fout = fs.openSync(logFile, 'w')
+
+    if options.options.stdio
+      stdio = options.options.stdio
+    else
+      @fout = fs.openSync(logFile, 'w')
+      stdio = ['ignore', @fout, @fout]
 
     nodePath = process.execPath
     nodeDir = path.dirname(nodePath)
@@ -148,7 +154,7 @@ class sanjo.LongRunningChildProcess
       cwd: options.options.cwd or @_getMeteorAppPath(),
       env: env,
       detached: true,
-      stdio: ['ignore', @fout, @fout]
+      stdio: stdio
     }
     command = path.basename options.command
     spawnScript = @_getSpawnScriptPath()
