@@ -1,7 +1,7 @@
 Package.describe({
   name: 'sanjo:long-running-child-process',
   summary: 'Spawn child processes that survive restarts and exit when the app exits.',
-  version: '1.1.0',
+  version: '1.1.1',
   git: 'https://github.com/Sanjo/meteor-long-running-child-process.git'
 });
 

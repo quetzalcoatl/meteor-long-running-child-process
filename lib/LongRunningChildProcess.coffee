@@ -169,7 +169,7 @@ class sanjo.LongRunningChildProcess
 
     @child.on "exit", (code) =>
       log.debug "LongRunningChildProcess: child_process.on 'exit': command=#{command} code=#{code}"
-      fs.closeSync(@fout)
+      fs.closeSync(@fout) if @fout
 
     return true
 
