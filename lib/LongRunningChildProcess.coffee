@@ -150,6 +150,8 @@ class sanjo.LongRunningChildProcess
     env = _.clone(options.options.env or process.env)
     # Expose the Meteor node binary path for the script that is run
     env.PATH = nodeDir + ':' + (env.PATH or process.env.PATH)
+    if not env.LONG_RUNNING_CHILD_PROCESS_LOG_LEVEL
+      env.LONG_RUNNING_CHILD_PROCESS_LOG_LEVEL = process.env.LONG_RUNNING_CHILD_PROCESS_LOG_LEVEL
     spawnOptions = {
       cwd: options.options.cwd or @_getMeteorAppPath(),
       env: env,
@@ -197,7 +199,6 @@ class sanjo.LongRunningChildProcess
 
 # Expose the imports in testing mode to make it possible to mock them
 if process.env.IS_MIRROR == 'true'
-  log.info 'Exposing imports for testing purposes'
   sanjo.LongRunningChildProcess.fs = fs
   sanjo.LongRunningChildProcess.path = path
   sanjo.LongRunningChildProcess.assert = assert
