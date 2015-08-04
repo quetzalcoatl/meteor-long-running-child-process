@@ -150,7 +150,7 @@ class sanjo.LongRunningChildProcess
     env = _.clone(options.options.env or process.env)
     # Expose the Meteor node binary path for the script that is run
     env.PATH = nodeDir + ':' + (env.PATH or process.env.PATH)
-    if not env.LONG_RUNNING_CHILD_PROCESS_LOG_LEVEL
+    if process.env.LONG_RUNNING_CHILD_PROCESS_LOG_LEVEL and not env.LONG_RUNNING_CHILD_PROCESS_LOG_LEVEL
       env.LONG_RUNNING_CHILD_PROCESS_LOG_LEVEL = process.env.LONG_RUNNING_CHILD_PROCESS_LOG_LEVEL
     spawnOptions = {
       cwd: options.options.cwd or @_getMeteorAppPath(),
