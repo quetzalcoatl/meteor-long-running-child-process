@@ -155,9 +155,11 @@ class sanjo.LongRunningChildProcess
     spawnOptions = {
       cwd: options.options.cwd or @_getMeteorAppPath(),
       env: env,
-      detached: true,
       stdio: stdio
     }
+    if process.platform != 'win32'
+      spawnOptions.detached = true
+
     command = path.basename options.command
     spawnScript = @_getSpawnScriptPath()
     commandArgs = [spawnScript, @_getMeteorPid(), @taskName, options.command].concat(options.args)
